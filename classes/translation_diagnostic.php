@@ -18,12 +18,14 @@ class translation_diagnostic {
 	}
 	
 	/**
-	 * @return RegexIterator
+	 * @param bool $skipInactive
+	 * @return TranslationDiagnosticFileFilterIterator
 	 */
-	static function getPhpFilesIterator() {
+	static function getPhpFilesIterator($skipInactive = false) {
 		$i = new RecursiveDirectoryIterator(elgg_get_config('path'), RecursiveDirectoryIterator::SKIP_DOTS);
 		$i = new RecursiveIteratorIterator($i, RecursiveIteratorIterator::LEAVES_ONLY);
 		$i = new RegexIterator($i, "/.*\.php/");
+		$i = new TranslationDiagnosticFileFilterIterator($i, $skipInactive);
 		return $i;
 	}
 	
