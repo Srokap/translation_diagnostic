@@ -129,7 +129,10 @@ foreach ($i as $filePath => $val) {
 // 		}
 	}
 }
-var_dump($totalS, $totalC);
+echo "Simple use cases: " . $totalS . "\n";
+echo "Complex use cases: " . $totalC . "\n";
+echo "\n";
+// var_dump($totalS, $totalC);
 // var_dump(isset($stats['APIException:APIAuthenticationFailed']));
 arsort($stats);
 // var_dump(isset($stats['APIException:APIAuthenticationFailed']));
@@ -148,10 +151,15 @@ $diff = array_diff($defined, $used);
 $missing = array_diff($used, $defined);
 sort($diff);
 sort($missing);
-var_dump(count($defined), count($used), count($diff));
-echo "Potentially unused:\n";
-print_r($diff);
-echo "Missing:\n";
+// var_dump(count($defined), count($used), count($diff));
+echo "Definitions count: " . count($defined) . "\n";
+echo "Recognized as used: " . count($used) . "\n";
+echo "Potentially obsolete: " . count($diff) . "\n";
+echo "\n";
+
+// echo "Potentially unused:\n";
+// print_r($diff);
+echo "Translation tokens missing definition:\n";
 print_r($missing);
 
 echo sprintf("Time taken: %.4fs\n", microtime(true) - $mt);
