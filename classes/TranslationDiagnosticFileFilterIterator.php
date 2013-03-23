@@ -3,11 +3,7 @@ class TranslationDiagnosticFileFilterIterator extends FilterIterator {
 	
 	function __construct($iterator, $skipInactive = false) {
 		if ($skipInactive) {
-			$pluginsDirs = elgg_get_plugin_ids_in_dir(elgg_get_config('path') . 'mod/');
-			$actives = elgg_get_plugins('active');
-			foreach ($actives as $plugin) {
-				$pluginsDirs = array_diff($pluginsDirs, array($plugin->getID()));
-			}
+			$pluginsDirs = TranslationDiagnosticAnalyzer::getPluginIds(TranslationDiagnosticAnalyzer::T_PLUGINS_INACTIVE);
 			foreach ($pluginsDirs as $pluginDir) {
 				$this->blacklist[] = 'mod/' . $pluginDir . '/.*';
 			}
