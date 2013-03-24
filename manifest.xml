@@ -7,6 +7,11 @@
 	<description>Performs translations analysis against used and defined tokens for the site code.</description>
 	<website>https://srokap.pl/</website>
 	<license>MIT License</license>
+	<screenshot>
+		<path>screenshots/analysis.png</path>
+		<description>Typical analysis view</description>
+	</screenshot>
+
 	<requires>
 		<type>elgg_release</type>
 		<version>1.8</version>
