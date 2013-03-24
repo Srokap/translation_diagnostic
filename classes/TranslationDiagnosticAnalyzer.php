@@ -100,10 +100,56 @@ class TranslationDiagnosticAnalyzer {
 	protected function printComplexMatchesReport() {
 		$result = '';
 		
-		$result .= "Complex cases: \n";
-		$result .= print_r($this->matchesComplex, true);
+		$tokenStructures = array();
+		$tokenStructuresStrs = array();
+		foreach ($this->matchesComplex as $row) {
+			list($echo, $list) = $row;
+			$id = '';
+			$str = '';
+			foreach ($list as $item) {
+				if (is_array($item)) {
+					if($item[0] != T_WHITESPACE) {
+						$id .= '#' . token_name($item[0]);
+					}
+					$str .= $item[1];
+				} else {
+					$id .= $item;
+					$str .= $item;
+				}
+			}
+// 			var_dump($id);
+// 			var_dump($str);
+			if (!isset($tokenStructures[$id])){
+				$tokenStructures[$id] = 0;
+			}
+			$tokenStructures[$id]++;
+			if (!isset($tokenStructuresStrs[$id])){
+				$tokenStructuresStrs[$id] = array();
+			}
+			$tokenStructuresStrs[$id][] = $str;
+		}
+		
+// 		arsort($tokenStructures);
+		uasort($tokenStructuresStrs, array($this, 'compareCountReversePredicate'));
+		
+		$result .= "Complex cases structures overview (distinct types " . count($tokenStructuresStrs) . "): \n";
+// 		$result .= print_r($tokenStructures, true);
+		$result .= print_r($tokenStructuresStrs, true);
+// 		$result .= print_r($this->matchesComplex, true);
 		
 		return $result;
+	}
+	
+	public function compareCountReversePredicate($a, $b) {
+		$ac = count($a);
+		$bc = count($b);
+		if ($ac < $bc) {
+			return 1;
+		} elseif ($ac > $bc) {
+			return -1;
+		} else {
+			return 0;
+		}
 	}
 	
 	/**
@@ -131,8 +177,6 @@ class TranslationDiagnosticAnalyzer {
 		sort($diff);
 		sort($missing);
 		
-// 		$result .= $this->printComplexMatchesReport();
-		
 		$result .= "Translation definitions count: " . count($defined) . "\n";
 		$result .= "Translations recognized as used: " . count($defAndUsed) . "\n";
 		$result .= "Tokens recognized as used: " . count($used) . "\n";
@@ -143,6 +187,11 @@ class TranslationDiagnosticAnalyzer {
 		// print_r($diff);
 		$result .= "Translation tokens definitely missing definition (" . count($missing) . "):\n";
 		$result .= print_r($missing, true);
+		$result .= "\n";
+		
+		//complex cases report
+		$result .= $this->printComplexMatchesReport();
+		
 		return $result;
 	}
 	
@@ -178,6 +227,15 @@ class TranslationDiagnosticAnalyzer {
 	}
 	
 	/**
+	 * @param array|string $val
+	 * @param int $token
+	 * @return boolean
+	 */
+	public function isToken($val, $token) {
+		return is_array($val) && $val[0] == $token;
+	}
+	
+	/**
 	 * Find elgg_echo invocations and extract together with parameters
 	 * @param string $contents
 	 * @return array
@@ -189,24 +247,31 @@ class TranslationDiagnosticAnalyzer {
 			if (is_array($row)) {
 				list($token, $content, $lineNumber) = $row;
 				if ($token==T_STRING && strpos($content, 'elgg_echo')!==false) {
-					$hit = array();
-					$i = 1;
-					$hit[] = $phpTokens[$key + 1];
-					$key2 = $key + 2;
-					while ($i>0 && count($hit)<200) {
-						$t = $phpTokens[$key2];
-						if ($t == '(') {
-							$i++;
-						} elseif($t == ')') {
-							$i--;
+					if (isset($phpTokens[$key - 2]) 
+						&& $this->isToken($phpTokens[$key - 2], T_FUNCTION)
+						&& $this->isToken($phpTokens[$key - 1], T_WHITESPACE)
+					) {
+						//skipping elgg_echo defninition
+					} else {
+						$hit = array();
+						$i = 1;
+						$hit[] = $phpTokens[$key + 1];
+						$key2 = $key + 2;
+						while ($i>0 && count($hit)<200) {
+							$t = $phpTokens[$key2];
+							if ($t == '(') {
+								$i++;
+							} elseif($t == ')') {
+								$i--;
+							}
+							$hit[] = $t;
+							$key2++;
 						}
-						$hit[] = $t;
-						$key2++;
+						$result[] = array(
+							$row,
+							$hit
+						);
 					}
-					$result[] = array(
-						$row,
-						$hit
-					);
 				}
 			}
 		}
