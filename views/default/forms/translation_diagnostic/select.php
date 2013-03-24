@@ -14,7 +14,7 @@ echo '</p>';
 
 echo '<p>';
 echo '<label>' . elgg_echo('translation_diagnostic:disabled_plugins_only') . '</label> ';
-echo elgg_view('input/select', array(
+echo elgg_view('input/dropdown', array(
 	'name' => 'include_disabled_plugins',
 	'value' => get_input('include_disabled_plugins', 0),
 	'options_values' => array(
