@@ -5,7 +5,7 @@ $language = elgg_extract('language', $vars, elgg_get_config('site')->language);
 
 echo '<p>';
 echo '<label>' . elgg_echo('translation_diagnostic:language') . '</label> ';
-echo elgg_view('input/select', array(
+echo elgg_view('input/dropdown', array(
 	'name' => 'language',
 	'value' => get_input('language', $language),
 	'options_values' => get_installed_translations(),

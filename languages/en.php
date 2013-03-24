@@ -1,5 +1,5 @@
 <?php
-return array(
+$result = array(
 	'admin:translations' => 'Translations',
 	'admin:translations:diagnostic' => 'Translations diagnostic',
 	'translation_diagnostic:form' => 'Options',
@@ -9,3 +9,5 @@ return array(
 	'translation_diagnostic:language' => 'Language to analyze',
 	'translation_diagnostic:disabled_plugins_only' => 'Include disabled plugins',
 );
+add_translation('en', $result);//let's be nice for 1.8 users
+// return $result;//1.9 standard

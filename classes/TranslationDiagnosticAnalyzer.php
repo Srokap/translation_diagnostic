@@ -38,7 +38,7 @@ class TranslationDiagnosticAnalyzer {
 		
 		switch ($type) {
 			case self::T_PLUGINS_INACTIVE:
-				$pluginsDirs = elgg_get_plugin_ids_in_dir(elgg_get_config('path') . 'mod/');
+				$pluginsDirs = self::getPluginIds(self::T_PLUGINS_ALL);
 				$actives = elgg_get_plugins('active');
 				foreach ($actives as $plugin) {
 					$pluginsDirs = array_diff($pluginsDirs, array($plugin->getID()));
